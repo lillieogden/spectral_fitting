@@ -21,7 +21,7 @@ def download_file(file_path, filename, url):
     if os.path.isfile(file_path + '.h5'):
         dat_raw = avm.load(file_path + '.h5')
     # ....as a '.VEC' file, save it as an '.h5' and then read it using dolfyn library
-    elif os.path.isfile(file_path + ',VEC'):
+    elif os.path.isfile(file_path + '.VEC'):
         dat_raw = avm.read_nortek(file_path + '.VEC')
         dat_raw.save(file_path + '.h5')
     # if the file does not exist as either a '.VEC' or '.h5', download it from the internet,
