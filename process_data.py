@@ -11,11 +11,9 @@ FILENAMES = [
 ]
 
 
-def load_data(filename, binned=False):
+def load_data(filename):
     """Load ``filename``."""
     fname = './data_cache/' + filename
-    if binned:
-        fname += '_binned'
     data = avm.load(fname + '.h5')
     return data
 

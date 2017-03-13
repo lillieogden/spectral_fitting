@@ -11,7 +11,7 @@ FILENAMES = [
 
 def vel_spectra_plot(filename):
     """Plot the turbulence spectra"""
-    dat_bin = load_data(filename, binned=True)
+    dat_bin = load_data(filename + '_binned')
 
     fig = plt.figure(2, figsize=[6, 6])
     fig.clf()
