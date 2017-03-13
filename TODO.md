@@ -4,9 +4,18 @@ For Lillie
 Create a script that:
 -------
 
-  1. Pulls all data
+  1. Pulls all data (.VEC files)
   2. Processes data
-  3. Plots data
+     - Loads .VEC file
+     - Cleans data
+     - Motion corrects data
+     - Rotates to 'principal axes'
+     - Saves this data to a .h5 file
+     - 'bins' the data
+     - Save the 'bin' data to a .h5 file
+  3. Plots basic results (time series, and spectra)
+     - The figures should be saved to a folder inside of the
+       repository.
   
   Each of the items above should be their own module. Build one of them at a time. The `main.py` script should sit in the home directory, and import the above modules, and have a function `run()` or `main()` that runs the steps above as three commands, e.g., `pull_data()`, `process_data()`, `plot_results()`.
 
