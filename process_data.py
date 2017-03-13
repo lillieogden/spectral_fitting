@@ -20,8 +20,8 @@ def load_data(filename):
 
 def crop_data(data):
     """Crops the data"""
-    t_range_inds = ((data.props['inds_range'][0] < data.mpltime) &
-                    (data.mpltime < data.props['inds_range'][1]))
+    t_range_inds = ((data.props['time_range'][0] < data.mpltime) &
+                    (data.mpltime < data.props['time_range'][1]))
     data.subset(t_range_inds)
 
 

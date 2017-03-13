@@ -26,7 +26,7 @@ def processed_plot(dat_raw, dat_screen, filename):
     # Plot the screened data:
     ax.plot(dat_screen.mpltime, dat_screen.u, 'o-', rasterized=True)
 
-    bads = np.abs(dat_screen.u - dat_raw.u[dat_raw.props['inds_range']])
+    bads = np.abs(dat_screen.u - dat_raw.u[dat_raw.props['time_range']])
     ax.text(0.55, 0.95, (np.float(sum(bads > 0)) / len(bads) * 100),
             transform=ax.transAxes,
             va='top',
