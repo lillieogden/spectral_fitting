@@ -20,7 +20,7 @@ def load_vec(filename, url):
     # download the raw ADV file specified by the above path
     # ff the file exists...
     # ....as an '.h5' file, read it
-    filename = filename.rstrip('.VEC')
+    filename = './data_cache/' + filename.rstrip('.VEC')
     if os.path.isfile(filename + '.h5'):
         dat_raw = avm.load(filename + '.h5')
     # ....as a '.VEC' file, save it as an '.h5' and then read it using dolfyn library
