@@ -72,6 +72,7 @@ def vel_spectra_plot(dat, dat_cln):
     ax.set_title('Velocity Spectra')
     ax.legend()
     plt.show()
+    fig.savefig('/Users/lillie/turbulence_data/fit_graphs/TTM_NREL03_May2015_vel_spec.png')
     return plt
 
 
@@ -84,7 +85,7 @@ def main():
     dat_raw = load_vec(filename, url)
 
     # set the t_range inds based on the props attribute
-    t_range_inds = (dat_raw.props.inds_range[0] < dat_raw.mpltime) & (dat_raw.mpltime < dat_raw.props.inds_range[1])
+    t_range_inds = (dat_raw.props['inds_range'][0] < dat_raw.mpltime) & (dat_raw.mpltime < dat_raw.props['inds_range'][1])
     dat_crop = dat_raw.subset(t_range_inds)
     dat = dat_raw.subset(t_range_inds)
 
@@ -118,6 +119,7 @@ def main():
     fig.plot(turbsim_output, color='k')
     fig.plot(tsr, color='r', linestyle='--')
     fig.finalize()
+
 
 # run the program
 main()
