@@ -60,9 +60,9 @@ def vel_spectra_plot(dat):
     fig.clf()
     ax = fig.add_axes([.14, .14, .8, .74])
     inds = dat_bin.u > 1.0
-    ax.loglog(dat_bin.freq, dat_bin.Spec[0, inds].mean(0), 'b-',
+    ax.loglog(dat_bin.freq, dat_bin.Spec[0, inds].mean(0) * pii, 'b-',
               label='motion corrected')
-    ax.loglog(dat_bin.freq, dat_bin.Spec_velraw[0, inds].mean(0), 'r-',
+    ax.loglog(dat_bin.freq, dat_bin.Spec_velraw[0, inds].mean(0) * pii, 'r-',
               label='no motion correction')
     ax.set_xlim([1e-3, 20])
     ax.set_ylim([1e-4, 1])
