@@ -44,9 +44,9 @@ if __name__ == '__main__':
     for filename in FILENAMES:
         data = avm.read_nortek(filename + '.VEC')
         save_h5(data, filename + '_raw')
-        crop_data(data)
         avm.motion.correct_motion(data, accel_filter)
         avm.rotate.earth2principal(data)
+        crop_data(data)
         avm.clean.GN2002(data)
         save_h5(data, filename + '_processed')
         dat_bin = bin_data(data)
