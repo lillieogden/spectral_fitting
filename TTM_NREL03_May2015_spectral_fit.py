@@ -13,25 +13,28 @@ import pyts.plot.api as pt
 # from pyts.specModels.hydro import specModelBase, np, specObj, ts_float
 
 
-def download_file(file_path, filename, url):
-    """ Downloads the raw ADV file """
+def load_vec(filename, url):
+    """Load ``filename``. If it doesn't exist, the file is
+    downloaded from ``url``.
+    """
     # download the raw ADV file specified by the above path
     # ff the file exists...
     # ....as an '.h5' file, read it
-    if os.path.isfile(file_path + '.h5'):
-        dat_raw = avm.load(file_path + '.h5')
+    filename = filename.rstrip('.VEC')
+    if os.path.isfile(filename + '.h5'):
+        dat_raw = avm.load(filename + '.h5')
     # ....as a '.VEC' file, save it as an '.h5' and then read it using dolfyn library
-    elif os.path.isfile(file_path + '.VEC'):
-        dat_raw = avm.read_nortek(file_path + '.VEC')
-        dat_raw.save(file_path + '.h5')
+    elif os.path.isfile(filename + '.VEC'):
+        dat_raw = avm.read_nortek(filename + '.VEC')
+        dat_raw.save(filename + '.h5')
     # if the file does not exist as either a '.VEC' or '.h5', download it from the internet,
     #  save it as a '.h5' file and read it
     else:
         response = urllib2.urlopen(url)
-        with open(filename, 'wb') as f:
+        with open(filename + '.VEC', 'wb') as f:
             f.write(response.read())
-        dat_raw = avm.read_nortek(f)
-        dat_raw.save(file_path + '.h5')
+        dat_raw = avm.read_nortek(filename + '.VEC')
+        dat_raw.save(filename + '.h5')
     return dat_raw
 
 
@@ -74,19 +77,11 @@ def vel_spectra_plot(dat, dat_cln):
 
 def main():
     """Runs the main program"""
-    # user specifications for the raw ADV file
-    file_path = '/Users/lillie/turbulence_data/raw_data/TTM_NREL03_May2015'
-    # body2head_vec = np.array([9.75, 2, -5.75]) * 0.0254
-    # body2head_rotmat = np.array([[0, 0, -1], [0, -1, 0], [-1, 0, 0]])
-    # x_start = .00835 + 7.3572944e5
-    # x_end = .304 + 7.35731e5
-    # t_range = [x_start, x_end]
     filename = 'TTM_NREL03_May2015.VEC'
     url = 'https://mhkdr.openei.org/files/51/TTM_NREL03_May2015.VEC'
     accel_filter = 0.1
-    load_vec = True
 
-    dat_raw = download_file(file_path, filename, url)
+    dat_raw = load_vec(filename, url)
 
     # set the t_range inds based on the props attribute
     t_range_inds = (dat_raw.props.inds_range[0] < dat_raw.mpltime) & (dat_raw.mpltime < dat_raw.props.inds_range[1])
