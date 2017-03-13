@@ -5,19 +5,17 @@ accel_filter = 0.03
 
 FILENAMES = [
     'TTM_NREL03_May2015',
-    #'TTM_NRELvector_Jun2012',
-    #'TTM01b_ADVbottom_NREL01_June2014',
-    #'TTM01_ADVtop_NREL02_June2014',
-    #'TTM01_ADVbottom_NREL01_June2014'
+    'TTM_NRELvector_Jun2012',
+    'TTM01b_ADVbottom_NREL01_June2014',
+    'TTM01_ADVtop_NREL02_June2014',
+    'TTM01_ADVbottom_NREL01_June2014'
 ]
 
 
 def load_data(filename):
     """Load ``filename``."""
     fname = './data_cache/' + filename
-    if os.path.isfile(fname + '.h5'):
-        data = avm.load(fname + '.h5')
-    elif os.path.isfile(fname + '.VEC'):
+    if os.path.isfile(fname + '.VEC'):
         data = avm.read_nortek(fname + '.VEC')
     else:
         print 'The file has not been downloaded yet.'
