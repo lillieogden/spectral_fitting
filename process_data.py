@@ -1,4 +1,3 @@
-import os.path
 import dolfyn.adv.api as avm
 
 accel_filter = 0.03
@@ -12,13 +11,12 @@ FILENAMES = [
 ]
 
 
-def load_data(filename):
+def load_data(filename, binned=False):
     """Load ``filename``."""
     fname = './data_cache/' + filename
-    if os.path.isfile(fname + '.VEC'):
-        data = avm.read_nortek(fname + '.VEC')
-    else:
-        print 'The file has not been downloaded yet.'
+    if binned:
+        fname += '_binned'
+    data = avm.load(fname + '.h5')
     return data
 
 
@@ -36,11 +34,13 @@ def bin_data(data):
     return dat_bin
 
 
-for filename in FILENAMES:
-    data = load_data(filename)
-    avm.clean.GN2002(data)
-    avm.motion.correct_motion(data, accel_filter)
-    avm.rotate.earth2principal(data)
-    save_h5(data, filename)
-    dat_bin = bin_data(data)
-    save_h5(dat_bin, filename + '_binned')
+if __name__ == '__main__':
+
+    for filename in FILENAMES:
+        data = avm.read_nortek(filename + '.VEC')
+        avm.clean.GN2002(data)
+        avm.motion.correct_motion(data, accel_filter)
+        avm.rotate.earth2principal(data)
+        save_h5(data, filename)
+        dat_bin = bin_data(data)
+        save_h5(dat_bin, filename + '_binned')
