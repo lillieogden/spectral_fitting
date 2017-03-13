@@ -12,6 +12,8 @@ import pyts.api as pyturb
 import pyts.plot.api as pt
 # from pyts.specModels.hydro import specModelBase, np, specObj, ts_float
 
+pii = 2 * np.pi
+
 
 def load_vec(filename, url):
     """Load ``filename``. If it doesn't exist, the file is
@@ -38,31 +40,30 @@ def load_vec(filename, url):
     return dat_raw
 
 
-def clean_correct(dat, dat_crop, accel_filter):
+def clean_correct(dat, accel_filter):
     """Cleans the raw data file and performs motion correction"""
-    # then clean the file using the Goring+Nikora method:
+    # clean the data using the Goring+Nikora method:
     avm.clean.GN2002(dat)
-    dat_cln = dat.copy()
     # then perform motion correction
-    avm.motion.correct_motion(dat_crop, accel_filter)
-    # rotate the uncorrected data into the earth frame, for comparison to motion correction:
-    avm.rotate.inst2earth(dat_cln)
-    # then rotate it into a 'principal axes frame':
-    avm.rotate.earth2principal(dat_crop)
-    avm.rotate.earth2principal(dat_cln)
-    return dat_cln, dat_crop
+    avm.motion.correct_motion(dat, accel_filter)
+    avm.rotate.earth2principal(dat)
+    return
 
 
-def vel_spectra_plot(dat, dat_cln):
+def vel_spectra_plot(dat):
     """Plot the turbulence spectra"""
     # average the data and compute turbulence statistics
-    dat_bin = avm.calc_turbulence(dat, n_bin=19200, n_fft=4096)
-    dat_cln_bin = avm.calc_turbulence(dat_cln, n_bin=19200, n_fft=4096)
+    binner = avm.TurbBinner(n_bin=19200, fs=dat.fs, n_fft=19200)
+    dat_bin = binner(dat)
+    dat_bin.add_data('Spec_velraw', binner.psd(dat['velraw']), 'spec')
     fig = plt.figure(2, figsize=[6, 6])
     fig.clf()
     ax = fig.add_axes([.14, .14, .8, .74])
-    ax.loglog(dat_bin.freq, dat_bin.Suu_hz.mean(0), 'b-', label='motion corrected')
-    ax.loglog(dat_cln_bin.freq, dat_cln_bin.Suu_hz.mean(0), 'r-', label='no motion correction')
+    inds = dat_bin.u > 1.0
+    ax.loglog(dat_bin.freq, dat_bin.Spec[0, inds].mean(0), 'b-',
+              label='motion corrected')
+    ax.loglog(dat_bin.freq, dat_bin.Spec_velraw[0, inds].mean(0), 'r-',
+              label='no motion correction')
     ax.set_xlim([1e-3, 20])
     ax.set_ylim([1e-4, 1])
     ax.set_xlabel('frequency [hz]')
@@ -71,29 +72,27 @@ def vel_spectra_plot(dat, dat_cln):
     ax.plot(f_tmp, 4e-5 * f_tmp ** (-5. / 3), 'k--')
     ax.set_title('Velocity Spectra')
     ax.legend()
-    plt.show()
-    fig.savefig('/Users/lillie/turbulence_data/fit_graphs/TTM_NREL03_May2015_vel_spec.png')
-    return plt
+    return dat_bin
 
 
 def main():
     """Runs the main program"""
     filename = 'TTM_NREL03_May2015.VEC'
     url = 'https://mhkdr.openei.org/files/51/TTM_NREL03_May2015.VEC'
-    accel_filter = 0.1
+    accel_filter = 0.03
 
     dat_raw = load_vec(filename, url)
 
     # set the t_range inds based on the props attribute
-    t_range_inds = (dat_raw.props['inds_range'][0] < dat_raw.mpltime) & (dat_raw.mpltime < dat_raw.props['inds_range'][1])
-    dat_crop = dat_raw.subset(t_range_inds)
+    t_range_inds = ((dat_raw.props['inds_range'][0] < dat_raw.mpltime) &
+                    (dat_raw.mpltime < dat_raw.props['inds_range'][1]))
     dat = dat_raw.subset(t_range_inds)
 
     # clean the data and perform motion corretcion
-    dat_cln, dat_crop = clean_correct(dat, dat_crop, accel_filter)
+    clean_correct(dat, accel_filter)
 
     # plot the velocity spectra
-    vel_spectra = vel_spectra_plot(dat, dat_cln)
+    dat_bin = vel_spectra_plot(dat)
 
     # begin work with PyTurbSim
     # define some variables
@@ -119,7 +118,7 @@ def main():
     fig.plot(turbsim_output, color='k')
     fig.plot(tsr, color='r', linestyle='--')
     fig.finalize()
-
+    return dat, dat_bin
 
 # run the program
-main()
+dat, dat_bin = main()
