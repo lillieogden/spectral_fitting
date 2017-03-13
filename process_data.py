@@ -1,8 +1,15 @@
 import os.path
 import dolfyn.adv.api as avm
 
-FILENAMES = ['TTM_NREL03_May2015', 'TTM_NRELvector_Jun2012', 'TTM01b_ADVbottom_NREL01_June2014',
-             'TTM01_ADVtop_NREL02_June2014', 'TTM01_ADVbottom_NREL01_June2014']
+accel_filter = 0.03
+
+FILENAMES = [
+    'TTM_NREL03_May2015',
+    #'TTM_NRELvector_Jun2012',
+    #'TTM01b_ADVbottom_NREL01_June2014',
+    #'TTM01_ADVtop_NREL02_June2014',
+    #'TTM01_ADVbottom_NREL01_June2014'
+]
 
 
 def load_data(filename):
@@ -15,24 +22,6 @@ def load_data(filename):
     else:
         print 'The file has not been downloaded yet.'
     return data
-
-
-def clean(data):
-    """Cleans the raw data file"""
-    avm.clean.GN2002(data)
-    return
-
-
-def correct_motion(data, accel_filter):
-    """Performs motion correction"""
-    avm.motion.correct_motion(data, accel_filter)
-    return
-
-
-def rotate(data):
-    """Rotate the data to 'principal axes'"""
-    avm.rotate.earth2principal(data)
-    return
 
 
 def save_h5(data, filename):
@@ -51,10 +40,9 @@ def bin_data(data):
 
 for filename in FILENAMES:
     data = load_data(filename)
-    clean(data)
-    correct_motion(data)
-    rotate(data)
+    avm.clean.GN2002(data)
+    avm.motion.correct_motion(data, accel_filter)
+    avm.rotate.earth2principal(data)
     save_h5(data, filename)
     dat_bin = bin_data(data)
-    save_h5(data, filename + '_binned')
-
+    save_h5(dat_bin, filename + '_binned')
