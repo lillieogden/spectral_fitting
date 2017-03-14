@@ -33,7 +33,7 @@ def crop_data(data):
     """Crops the data"""
     t_range_inds = ((data.props['time_range'][0] < data.mpltime) &
                     (data.mpltime < data.props['time_range'][1]))
-    data.subset(t_range_inds)
+    return data.subset(t_range_inds)
 
 
 def save_h5(data, filename):
@@ -56,7 +56,7 @@ if __name__ == '__main__':
         data = load_raw(filename)
         avm.motion.correct_motion(data, accel_filter)
         avm.rotate.earth2principal(data)
-        crop_data(data)
+        data = crop_data(data)
         avm.clean.GN2002(data)
         save_h5(data, filename + '_processed')
         dat_bin = bin_data(data)
