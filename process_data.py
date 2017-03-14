@@ -54,7 +54,6 @@ if __name__ == '__main__':
 
     for filename in FILENAMES:
         data = load_raw(filename)
-        save_h5(data, filename + '_raw')
         avm.motion.correct_motion(data, accel_filter)
         avm.rotate.earth2principal(data)
         crop_data(data)
