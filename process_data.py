@@ -1,4 +1,5 @@
 import dolfyn.adv.api as avm
+from os.path import isfile
 
 accel_filter = 0.03
 
@@ -15,6 +16,16 @@ def load_data(filename):
     """Load ``filename``."""
     fname = './data_cache/' + filename
     data = avm.load(fname + '.h5')
+    return data
+
+
+def load_raw(filename):
+    filename = './data_cache/' + filename
+    if isfile(filename + '_raw.h5'):
+        data = avm.load(filename + '_raw.h5')
+    else:
+        data = avm.read_nortek(filename + '.VEC')
+        data.save(filename + '_raw.h5')
     return data
 
 
@@ -42,8 +53,7 @@ def bin_data(data):
 if __name__ == '__main__':
 
     for filename in FILENAMES:
-        data = avm.read_nortek(filename + '.VEC')
-        save_h5(data, filename + '_raw')
+        data = load_raw(filename)
         avm.motion.correct_motion(data, accel_filter)
         avm.rotate.earth2principal(data)
         crop_data(data)
