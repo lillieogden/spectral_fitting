@@ -26,14 +26,14 @@ def processed_plot(dat_raw, dat_screen, filename):
     # Plot the screened data:
     ax.plot(dat_screen.mpltime, dat_screen.u, 'o-', rasterized=True)
 
-    bads = np.abs(dat_screen.u - dat_raw.u[dat_raw.props['time_range']])
-    ax.text(0.55, 0.95, (np.float(sum(bads > 0)) / len(bads) * 100),
-            transform=ax.transAxes,
-            va='top',
-            ha='left',
-            )
+    # bads = np.abs(dat_screen.u - dat_raw.u[dat_raw.props['time_range'][0], dat_raw.props['time_range'][1]])
+    # ax.text(0.55, 0.95, (np.float(sum(bads > 0)) / len(bads) * 100),
+    #         transform=ax.transAxes,
+    #         va='top',
+    #         ha='left',
+    #         )
 
-    ax.axvspan(dat_raw.mpltime[0], t_range[0], zorder=-10, facecolor='0.9', edgecolor='none')
+    ax.axvspan(dat_raw.mpltime[0], dat_raw.props['time_range'][0], zorder=-10, facecolor='0.9', edgecolor='none')
     ax.text(0.13, 1.0, 'Mooring falling\ntoward seafloor', ha='center', va='top', transform=ax.transAxes, size='small')
     ax.text(0.3, 0.6, 'Mooring on seafloor', ha='center', va='top', transform=ax.transAxes, size='small')
     ax.annotate('', (0.25, 0.4), (0.4, 0.4), arrowprops=dict(facecolor='black'))
