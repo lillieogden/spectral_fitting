@@ -2,6 +2,7 @@ import numpy as np
 from process_data import load_data
 import scipy
 from scipy import optimize
+import matplotlib.pyplot as plt
 
 FILENAMES = [
     'TTM_NREL03_May2015',
@@ -35,7 +36,7 @@ def def_x_y(dat_bin, z, u_star, U_hor):
     y = dat_bin.Spec[0, uinds].mean(0) * pii
     x_norm = (x * z) / U_hor
     y_norm = (y * U_hor) / (z * u_star)
-    return x_norm, y_norm
+    return x_norm, y_norm, x, y
 
 
 for filename in FILENAMES:
@@ -53,10 +54,28 @@ for filename in FILENAMES:
     for indices, words in zip(UINDS, UINDS_words):
         uinds = indices
         u_star, U_hor = def_vars(dat_bin, uinds)
-        x_norm, y_norm = def_x_y(dat_bin, z, u_star, U_hor)
+        x_norm, y_norm, x, y = def_x_y(dat_bin, z, u_star, U_hor)
         popt, pcov = scipy.optimize.curve_fit(function, x_norm, y_norm)
         print ("For" + words + " in the file " + filename + " the optimal values are " + str(popt))
         print popt
+
+        fig = plt.figure(1, figsize=[8, 4])
+        fig.clf()
+        ax = fig.add_axes([.14, .14, .8, .74])
+
+        # plot our data
+        ax.plot(x_norm, y_norm, 'b-')
+        ax.set_autoscale_on(False)  # Otherwise, infinite loop
+
+        y_theory = function(x_norm, popt[0], popt[1])
+        ax.plot(x_norm, y_theory, 'r-')
+        ax.set_title(words + " for " + filename)
+
+        fig.savefig('./figures/spectral_fits/' + filename + '_fit_' + words + '.png')
+
+
+
+
 
 
 
