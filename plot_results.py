@@ -41,7 +41,7 @@ def processed_plot(dat_raw, dat_screen, filename):
     ax.set_xlabel('Time')
     ax.set_title('Data cropping and cleaning')
 
-    fig.savefig('./figures/' + filename + 'processed_plot.png')
+    fig.savefig('./figures/' + filename + '_processed_plot.png')
 
 
 def spectrum_plot(dat_bin, filename):
