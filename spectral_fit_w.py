@@ -30,10 +30,13 @@ def def_vars(dat_bin, winds):
     return u_star, U_hor
 
 
-def def_x_y(dat_bin, z, u_star, U_hor, winds):
+def def_x_y(dat_bin, z, u_star, U_hor, winds, freq_range):
     """Defines x and y and normalizes them"""
-    x = dat_bin.freq
+    # ifreq = np.zeros(dat_bin.freq.shape, dtype='bool')
+    ifreq = ((freq_range[0] < dat_bin.freq) & (dat_bin.freq < freq_range[1]))
+    x = dat_bin.freq[ifreq]
     y = dat_bin.Spec[0, winds].mean(0) * pii
+    y = y[ifreq]
     x_norm = (x * z) / U_hor
     y_norm = (y * U_hor) / (z * u_star)
     return x_norm, y_norm, x, y
@@ -54,8 +57,9 @@ for filename in FILENAMES:
                    ' u greater than 2.0 ']
     for indices, words in zip(WINDS, WINDS_words):
         winds = indices
+        freq_range = [0, 3]
         u_star, U_hor = def_vars(dat_bin, winds)
-        x_norm, y_norm, x, y = def_x_y(dat_bin, z, u_star, U_hor, winds)
+        x_norm, y_norm, x, y = def_x_y(dat_bin, z, u_star, U_hor, winds, freq_range)
         popt, pcov = scipy.optimize.curve_fit(function, x_norm, y_norm)
         print ("For" + words + " in the file " + filename + " the optimal values are " + str(popt))
         print popt
