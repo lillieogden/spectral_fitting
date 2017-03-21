@@ -3,6 +3,8 @@ from process_data import load_data
 import scipy
 from scipy import optimize
 import matplotlib.pyplot as plt
+import pandas as pd
+from os.path import isfile
 
 FILENAMES = [
     'TTM_NREL03_May2015',
@@ -42,6 +44,22 @@ def def_x_y(dat_bin, z, u_star, U_hor, winds, freq_range):
     return x_norm, y_norm, x, y
 
 
+def spectra_fit_plot(x_norm, y_norm, filename, words, popt):
+    """Plots the spectral fit over the data"""
+    fig = plt.figure(1, figsize=[8, 4])
+    fig.clf()
+    ax = fig.add_axes([.14, .14, .8, .74])
+
+    # plot our data
+    ax.loglog(x_norm, y_norm, 'b-')
+    ax.set_autoscale_on(False)  # Otherwise, infinite loop
+
+    y_theory = function(x_norm, popt[0], popt[1])
+    ax.loglog(x_norm, y_theory, 'r-')
+    ax.set_title(words + " for " + filename)
+
+    fig.savefig('./figures/spectral_fits/w/' + filename + '_fit_' + words + '.png')
+
 for filename in FILENAMES:
 
     dat_bin = load_data(filename + '_binned')
@@ -55,6 +73,14 @@ for filename in FILENAMES:
                    ' u between 1.0 and 1.5 ',
                    ' u between 1.5 and 2.0 ',
                    ' u greater than 2.0 ']
+
+    fname = './csv_files/' + filename + '_results.csv'
+    if isfile(fname):
+        df = pd.DataFrame.from_csv(fname)
+    else:
+        df = pd.DataFrame(index=WINDS_words)
+
+    popts = []
     for indices, words in zip(WINDS, WINDS_words):
         winds = indices
         freq_range = [0, 3]
@@ -63,18 +89,8 @@ for filename in FILENAMES:
         popt, pcov = scipy.optimize.curve_fit(function, x_norm, y_norm)
         print ("For" + words + " in the file " + filename + " the optimal values are " + str(popt))
         print popt
+        popts.append(popt)
+        spectra_fit_plot(x_norm, y_norm, filename, words, popt)
 
-        fig = plt.figure(1, figsize=[8, 4])
-        fig.clf()
-        ax = fig.add_axes([.14, .14, .8, .74])
-
-        # plot our data
-        ax.loglog(x_norm, y_norm, 'b-')
-        ax.set_autoscale_on(False)  # Otherwise, infinite loop
-
-        y_theory = function(x_norm, popt[0], popt[1])
-        ax.loglog(x_norm, y_theory, 'r-')
-        ax.set_title(words + " for " + filename)
-
-        fig.savefig('./figures/spectral_fits/w/' + filename + '_fit_' + words + '.png')
-
+    df['w'] = popts
+    df.to_csv(fname)
