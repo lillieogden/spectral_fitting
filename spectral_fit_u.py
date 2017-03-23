@@ -59,7 +59,7 @@ def spectra_fit_plot(x_norm, x, y, filename, words, popt, u_star, U_hor):
     y_theory = y_theory_norm * u_star * z / U_hor
     ax.loglog(x_norm * U_hor / z, y_theory, 'r-')
     ax.set_title(words + " for " + filename)
-    #fig.savefig('./figures/spectral_fits/u/' + filename + '_fit_' + words + '.png')
+    fig.savefig('./figures/spectral_fits/u/' + filename + '_fit_' + words + '.png')
 
 
 for filename in FILENAMES:
@@ -84,8 +84,10 @@ for filename in FILENAMES:
 
 
     popts = []
+    uinds_sums = []
     for indices, words in zip(UINDS, UINDS_words):
         uinds = indices
+        N = uinds.sum()
         freq_range = (0, 4)
         u_star, U_hor = def_vars(dat_bin, uinds)
         x_norm, y_norm, x, y = def_x_y(dat_bin, z, u_star, U_hor, uinds, freq_range)
@@ -93,10 +95,10 @@ for filename in FILENAMES:
         print ("For" + words + " in the file " + filename + " the optimal values are " + str(popt))
         print popt
         popts.append(popt)
+        uinds_sums.append(N)
 
         spectra_fit_plot(x_norm, x, y, filename, words, popt, u_star, U_hor)
 
     df['u'] = popts
+    df['N_u'] = uinds_sums
     df.to_csv(fname)
-
-
