@@ -83,7 +83,8 @@ for filename in FILENAMES:
         df = pd.DataFrame(index=UINDS_words)
 
 
-    popts = []
+    popts_a = []
+    popts_b = []
     uinds_sums = []
     mean_u = []
     for indices, words in zip(UINDS, UINDS_words):
@@ -96,13 +97,15 @@ for filename in FILENAMES:
         popt, pcov = optimize.curve_fit(function, x_norm, y_norm)
         print ("For" + words + " in the file " + filename + " the optimal values are " + str(popt))
         print popt
-        popts.append(popt)
+        popts_a.append(popt[0])
+        popts_b.append(popt[1])
         uinds_sums.append(N)
         mean_u.append(avg_u)
 
         spectra_fit_plot(x_norm, x, y, filename, words, popt, u_star, U_hor)
 
-    df['u'] = popts
+    df['u_a'] = popts_a
+    df['u_b'] = popts_b
     df['N_u'] = uinds_sums
     df['mean_u'] = mean_u
     df.to_csv(fname)
