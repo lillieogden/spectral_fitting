@@ -83,10 +83,12 @@ for filename in FILENAMES:
 
     popts = []
     winds_sums = []
+    mean_w = []
     for indices, words in zip(WINDS, WINDS_words):
         winds = indices
         N = winds.sum()
         freq_range = [0, 3]
+        avg_w = dat_bin.w[winds].mean()
         u_star, U_hor = def_vars(dat_bin, winds)
         x_norm, y_norm, x, y = def_x_y(dat_bin, z, u_star, U_hor, winds, freq_range)
         popt, pcov = optimize.curve_fit(function, x_norm, y_norm)
@@ -94,8 +96,10 @@ for filename in FILENAMES:
         print popt
         popts.append(popt)
         winds_sums.append(N)
+        mean_w.append(avg_w)
         spectra_fit_plot(x_norm, x, y, filename, words, popt, u_star, U_hor)
 
     df['w'] = popts
     df['N_w'] = winds_sums
+    df['mean_w'] = mean_w
     df.to_csv(fname)

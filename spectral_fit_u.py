@@ -85,10 +85,12 @@ for filename in FILENAMES:
 
     popts = []
     uinds_sums = []
+    mean_u = []
     for indices, words in zip(UINDS, UINDS_words):
         uinds = indices
         N = uinds.sum()
         freq_range = (0, 4)
+        avg_u = dat_bin.u[uinds].mean()
         u_star, U_hor = def_vars(dat_bin, uinds)
         x_norm, y_norm, x, y = def_x_y(dat_bin, z, u_star, U_hor, uinds, freq_range)
         popt, pcov = optimize.curve_fit(function, x_norm, y_norm)
@@ -96,9 +98,12 @@ for filename in FILENAMES:
         print popt
         popts.append(popt)
         uinds_sums.append(N)
+        mean_u.append(avg_u)
 
         spectra_fit_plot(x_norm, x, y, filename, words, popt, u_star, U_hor)
 
     df['u'] = popts
     df['N_u'] = uinds_sums
+    df['mean_u'] = mean_u
     df.to_csv(fname)
+
