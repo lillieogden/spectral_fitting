@@ -69,7 +69,7 @@ for filename in FILENAMES:
             (0.05 < abs(dat_bin.v)) & (abs(dat_bin.v) < 0.1),
             (0.1 < abs(dat_bin.v)) & (abs(dat_bin.v) < 0.2),
             (0.2 < abs(dat_bin.v)) & (abs(dat_bin.v) < 0.3),
-            abs(dat_bin.u) > 0.3]
+            abs(dat_bin.v) > 0.3]
     VINDS_words = [' v less than 0.5 ',
                    ' v between 0.5 and 1.0 ',
                    ' v between 1.0 and 1.5 ',

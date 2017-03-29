@@ -79,9 +79,9 @@ mean_w5 = df5['mean_w']
 scatter(mean_u1, a_u1, mean_u2, a_u2, mean_u3, a_u3, mean_u4, a_u4, mean_u5, a_u5, 'u_a')
 scatter(mean_u1, b_u1, mean_u2, b_u2, mean_u3, b_u3, mean_u4, b_u4, mean_u5, b_u5, 'u_b')
 
-scatter(mean_v1, a_v1, mean_v2, a_v2, mean_v3, a_v3, mean_v4, a_v4, mean_v5, a_v5, 'v_a')
-scatter(mean_v1, b_v1, mean_v2, b_v2, mean_v3, b_v3, mean_v4, b_v4, mean_v5, b_v5, 'v_b')
+scatter(mean_u1, a_v1, mean_u2, a_v2, mean_u3, a_v3, mean_u4, a_v4, mean_u5, a_v5, 'v_a')
+scatter(mean_u1, b_v1, mean_u2, b_v2, mean_u3, b_v3, mean_u4, b_v4, mean_u5, b_v5, 'v_b')
 
-scatter(mean_w1, a_w1, mean_w2, a_w2, mean_w3, a_w3, mean_w4, a_w4, mean_w5, a_w5, 'w_a')
-scatter(mean_w1, b_w1, mean_w2, b_w2, mean_w3, b_w3, mean_w4, b_w4, mean_w5, b_w5, 'w_b')
+scatter(mean_u1, a_w1, mean_u2, a_w2, mean_u3, a_w3, mean_u4, a_w4, mean_u5, a_w5, 'w_a')
+scatter(mean_u1, b_w1, mean_u2, b_w2, mean_u3, b_w3, mean_u4, b_w4, mean_u5, b_w5, 'w_b')
 
