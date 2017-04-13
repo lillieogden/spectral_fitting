@@ -24,58 +24,77 @@ def function(x_normalized, a, b):
     return a / (1 + (b * x_normalized)) ** (5 / 3)
 
 
-def def_vars(dat_bin, uinds):
+def def_vars(dat_bin, inds_t):
     """Defines the variables"""
     ustar = (dat_bin.upwp_ ** 2 + dat_bin.vpwp_ ** 2) ** .5
-    u_star = ustar[uinds].mean()
+    u_star = ustar[inds_t]
+    u_star = u_star[None,:]
     Uhor = (dat_bin.u ** 2 + dat_bin.v ** 2) ** .5
-    U_hor = Uhor[uinds].mean()
+    U_hor = Uhor[inds_t]
+    U_hor = U_hor[:, None]
     return u_star, U_hor
 
 
-def def_x_y(dat_bin, z, u_star, U_hor, uinds, freqinds):
+def def_x_y(dat_bin, z, u_star, U_hor, inds_t, inds_f):
     """Defines x and y and normalizes them"""
-    x = dat_bin.freq
-    x = x[freqinds][uinds]
-    y = dat_bin.Spec[0, uinds] * pii
-    x_norm = (x * z) / U_hor
-    y_norm = (y * U_hor) / (z * u_star)
-    return x_norm, y_norm, x, y
+    f = dat_bin.freq
+    f = f[inds_f][inds_t]
+    f = f[None,:]
+    y = dat_bin.Spec[0, inds_t] * pii
+    y_list = []
+    for i in range(len(y)):
+        y_list.append(y[i][inds_t])
+    Su = np.asarray(y_list)
+
+    f_norm = (f * z) / U_hor
+    Su_norm = (Su * U_hor) / (z * u_star)
+    return f_norm, Su_norm, f, y
 
 
-def spectra_fit_plot(x_norm, x, y, title, popt, u_star, U_hor):
+def spectra_fit_plot(f_norm, f, Su, title, popt, u_star, U_hor):
     """Plots the spectral fit over the data"""
     fig = plt.figure(1, figsize=[8, 4])
     fig.clf()
     ax = fig.add_axes([.14, .14, .8, .74])
 
     # plot our data
-    ax.loglog(x, y, 'b-')
+    ax.loglog(f, Su, 'b-')
     ax.set_autoscale_on(False)  # Otherwise, infinite loop
 
-    y_theory_norm = function(x_norm, popt[0], popt[1])
-    y_theory = y_theory_norm * u_star * z / U_hor
-    ax.loglog(x_norm * U_hor / z, y_theory, 'r-')
+    Su_theory_norm = function(f_norm, popt[0], popt[1])
+    Su_theory = Su_theory_norm * u_star * z / U_hor
+    ax.loglog(f_norm * U_hor / z, Su_theory, 'r-')
     ax.set_title(title)
     fig.savefig('./figures/spectral_fits/u/' + title + '.png')
 
-xs = []
-ys = []
-x_norms = []
-y_norms = []
+fs = []
+Sus = []
+f_norms = []
+Su_norms = []
 for filename in FILENAMES:
     dat_bin = load_data(filename + '_binned')
-    uinds = abs(dat_bin.u) > 0.5
-    freqinds = dat_bin.freq > 1
-    u_star, U_hor = def_vars(dat_bin, uinds)
-    x_norm, y_norm, x, y = def_x_y(dat_bin, z, u_star, U_hor, uinds, freqinds)
-    for item in x:
-        xs.append(item)
-    for item in y:
-        ys.append(item)
-    for item in x_norm:
-        x_norms.append(item)
-    for item in y_norm:
-        y_norms.append(item)
+    inds_t = abs(dat_bin.u**2 +dat_bin.v**2) > 0.5
+    inds_f = dat_bin.freq > 1
+    u_star, U_hor = def_vars(dat_bin, inds_t)
+    f_norm, Su_norm, f, Su = def_x_y(dat_bin, z, u_star, U_hor, inds_t, inds_f)
+    for item in f:
+        fs.append(item)
+    for item in Su:
+        Sus.append(item)
+    for item in f_norm:
+        f_norms.append(item)
+    for item in Su_norm:
+        Su_norms.append(item)
 
-popt, pcov = optimize.curve_fit(function, x_norms, y_norms)
+f_flat = []
+Su_flat = []
+for i in range(len(f_norms)):
+    for item in f_norms[i]:
+        f_flat.append(item)
+for i in range(len(Su_norms)):
+    for item in Su_norms[i]:
+        Su_flat.append(item)
+
+# when joining large arrays, it takes a lot memory so use numpy.hstack/vstack to turn into array
+# flatten the data before giving it to the fit function
+popt, pcov = optimize.curve_fit(function, f_flat, Su_flat)
