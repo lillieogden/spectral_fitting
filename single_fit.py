@@ -51,26 +51,27 @@ def def_x_y(dat_bin, z, u_star, U_hor, inds_t, inds_f):
     return f_norm, Su_norm, f, y
 
 
-def spectra_fit_plot(f_norm, f, Su, title, popt, u_star, U_hor):
+def spectra_fit_plot(f_final, Su_final,  title, popt):
     """Plots the spectral fit over the data"""
     fig = plt.figure(1, figsize=[8, 4])
     fig.clf()
     ax = fig.add_axes([.14, .14, .8, .74])
 
     # plot our data
-    ax.loglog(f, Su, 'b-')
+    ax.loglog(f_final, Su_final, 'b-')
     ax.set_autoscale_on(False)  # Otherwise, infinite loop
 
-    Su_theory_norm = function(f_norm, popt[0], popt[1])
-    Su_theory = Su_theory_norm * u_star * z / U_hor
-    ax.loglog(f_norm * U_hor / z, Su_theory, 'r-')
+    Su_theory = function(f_final, popt[0], popt[1])
+    ax.loglog(f_final, Su_theory, 'r-')
     ax.set_title(title)
-    fig.savefig('./figures/spectral_fits/u/' + title + '.png')
+    fig.savefig('./figures/spectral_fits/' + title + '.png')
 
 fs = []
 Sus = []
 f_norms = []
 Su_norms = []
+u_stars = []
+U_hors = []
 for filename in FILENAMES:
     dat_bin = load_data(filename + '_binned')
     inds_t = abs(dat_bin.u**2 +dat_bin.v**2) > 0.5
@@ -85,16 +86,31 @@ for filename in FILENAMES:
         f_norms.append(item)
     for item in Su_norm:
         Su_norms.append(item)
+    for item in u_star:
+        u_stars.append(item)
+    for item in U_hor:
+        U_hors.append(item)
 
 f_flat = []
 Su_flat = []
+u_star_flat = []
+U_hor_flat = []
 for i in range(len(f_norms)):
     for item in f_norms[i]:
         f_flat.append(item)
 for i in range(len(Su_norms)):
     for item in Su_norms[i]:
         Su_flat.append(item)
+for i in range(len(u_stars)):
+    for item in u_stars[i]:
+        u_star_flat.append(item)
+for i in range(len(U_hors)):
+    for item in U_hors[i]:
+        U_hor_flat.append(item)
 
+Su_final = np.array(Su_flat)
+f_final = np.array(f_flat)
 # when joining large arrays, it takes a lot memory so use numpy.hstack/vstack to turn into array
 # flatten the data before giving it to the fit function
-popt, pcov = optimize.curve_fit(function, f_flat, Su_flat)
+popt, pcov = optimize.curve_fit(function, f_final, Su_final)
+spectra_fit_plot(f_final, Su_final, 'Single Fit', popt)
