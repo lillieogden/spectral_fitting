@@ -64,23 +64,23 @@ fs = []
 Sus = []
 f_norms = []
 Su_norms = []
-for filename in FILENAMES:
-    dat_bin = load_data(filename + '_binned')
-    inds_t = abs(dat_bin.u**2 +dat_bin.v**2) > 0.5
-    inds_f = dat_bin.freq > 1
-    u_star, U_hor = def_vars(dat_bin, inds_t)
-    f_norm, Su_norm, f, Su = def_x_y(dat_bin, z, u_star, U_hor, inds_t, inds_f)
-    for item in f:
-        fs.append(item)
-    for item in Su:
-        Sus.append(item)
-    for item in f_norm:
-        f_norms.append(item)
-    for item in Su_norm:
-        Su_norms.append(item)
+
+dat_bin = load_data(FILENAMES[0] + '_binned')
+inds_t = (1.0 < abs((dat_bin.u**2 + dat_bin.v**2) ** .5)) & (abs((dat_bin.u**2 + dat_bin.v**2) ** .5) < 1.1)
+inds_f = dat_bin.freq > 1
+u_star, U_hor = def_vars(dat_bin, inds_t)
+f_norm, Su_norm, f, Su = def_x_y(dat_bin, z, u_star, U_hor, inds_t, inds_f)
+for item in f:
+    fs.append(item)
+for item in Su:
+    Sus.append(item)
+for item in f_norm:
+    f_norms.append(item)
+for item in Su_norm:
+    Su_norms.append(item)
 
 f_final = np.hstack(f_norms)
 Su_final = np.hstack(Su_norms)
 
 popt, pcov = optimize.curve_fit(function, f_final, Su_final)
-spectra_fit_plot(f_final, Su_final, 'Single Fit', popt)
+spectra_fit_plot(f_final, Su_final, 'Single Fit_1', popt)
