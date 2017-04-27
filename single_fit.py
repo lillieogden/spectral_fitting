@@ -138,7 +138,7 @@ def scat_hist2d(f_final, Su_final, f_fit, a, b,
     ax.loglog(f_fit, Su_theory, 'r-')
 
     Su_walter = function(f_fit, a, b)
-    ax.loglog(f_fit, Su_walter, 'm-')
+    ax.loglog(f_fit, Su_walter, 'orange')
     plt.savefig('./figures/spectral_fits/single_fit_all_data.png')
 
 fs = []
